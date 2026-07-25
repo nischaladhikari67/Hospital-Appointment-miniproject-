@@ -1,131 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Book Appointment - CarePoint</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - NTN HEALTH CARE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f7fafc;
-            padding: 2rem;
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #090d16;
         }
-
-        .card {
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .dark-card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
-
-        h2 {
-            color: #2b6cb0;
-            margin-bottom: 1.5rem;
+        .doctor-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #1f2937;
         }
-
-        .form-group {
-            margin-bottom: 1rem;
+        .doctor-card.selected {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
         }
-
-        label {
-            display: block;
-            margin-bottom: 0.3rem;
-            font-weight: bold;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 0.75rem;
-            background: #2b6cb0;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
+        /* Custom styling for dark mode date and time inputs */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
             cursor: pointer;
+            opacity: 0.8;
         }
-
-        .top-nav {
-            margin-bottom: 1rem;
-            max-width: 500px;
-            margin: 0 auto 1rem auto;
-        }
-
-        .top-nav a {
-            text-decoration: none;
-            color: #2b6cb0;
-            font-weight: bold;
+        input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        input[type="time"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
         }
     </style>
 </head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 my-8">
 
-<body>
-    <div class="top-nav"><a href="/">← Back to Home</a></div>
-    <div class="card">
-        <h2>Book Appointment</h2>
-        <form id="bookForm">
-            <div class="form-group">
-                <label>Patient Full Name</label>
-                <input type="text" id="patientName" required placeholder="e.g. Jane Doe">
+    <!-- Top Bar -->
+    <div class="w-full max-w-4xl mb-6 flex justify-between items-center">
+        <a href="/" class="group flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-sky-400 transition">
+            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 group-hover:border-sky-500/50 transition">
+                <i class="fa-solid fa-arrow-left"></i>
             </div>
-            <div class="form-group">
-                <label>Select Specialist</label>
-                <select id="doctorName" required>
-                    <option value="">-- Select Doctor --</option>
-                    <option value="Dr. Smith (Cardiology)">Dr. Smith (Cardiology)</option>
-                    <option value="Dr. Patel (Dermatology)">Dr. Patel (Dermatology)</option>
-                    <option value="Dr. Sharma (Pediatrics)">Dr. Sharma (Pediatrics)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Date</label>
-                <input type="date" id="appDate" required>
-            </div>
-            <div class="form-group">
-                <label>Time</label>
-                <input type="time" id="appTime" required>
-            </div>
-            <button type="submit">Submit Booking</button>
-        </form>
+            <span>Back to Dashboard</span>
+        </a>
+        <div class="flex items-center gap-2 text-sky-400 font-extrabold text-sm tracking-wider">
+            <i class="fa-solid fa-square-h text-xl"></i> NTN HEALTH CARE
+        </div>
     </div>
 
-    <script>
-        document.getElementById('appDate').min = new Date().toISOString().split('T')[0];
+    <!-- Main Container -->
+    <main class="w-full max-w-4xl dark-card rounded-3xl p-8 relative overflow-hidden">
+        <div class="mb-8 border-b border-slate-800 pb-5">
+            <h1 class="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                <span>Book Appointment</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Select your specialist, date, preferred time slot, and describe your symptoms.</p>
+        </div>
 
-        document.getElementById('bookForm').addEventListener('submit', async (e) => {
+        <form id="bookingForm" class="space-y-6">
+            
+            <!-- Patient Name -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">
+                    <i class="fa-solid fa-user-gear text-sky-400 mr-1.5"></i> Patient Full Name
+                </label>
+                <input type="text" id="patient_name" required placeholder="e.g. Jane Doe"
+                    class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition">
+            </div>
+
+            <!-- Doctor Visual Selector Cards (8 Doctors Grid) -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">
+                    <i class="fa-solid fa-user-doctor text-sky-400 mr-1.5"></i> Select Specialist
+                </label>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="doctorGrid">
+                    
+                    <!-- Dr. Nikhil -->
+                    <div class="doctor-card selected p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Nikhil (Ophthalmologist)')">
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-eye"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Nikhil</div>
+                            <div class="text-xs text-cyan-400 font-medium">Ophthalmologist</div>
+                        </div>
+                    </div>
+
+                    <!-- Dr. Nischal -->
+                    <div class="doctor-card p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Nischal (Psychologist)')">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Nischal</div>
+                            <div class="text-xs text-purple-400 font-medium">Psychologist</div>
+                        </div>
+                    </div>
+
+                    <!-- Dr. Tarjan -->
+                    <div class="doctor-card p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Tarjan (Gynecologist)')">
+                        <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-venus"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Tarjan</div>
+                            <div class="text-xs text-rose-400 font-medium">Gynecologist</div>
+                        </div>
+                    </div>
+
+                    <!-- Dr. Sarah -->
+                    <div class="doctor-card p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Sarah (Cardiologist)')">
+                        <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Sarah</div>
+                            <div class="text-xs text-red-400 font-medium">Cardiologist</div>
+                        </div>
+                    </div>
+
+                    <!-- Dr. Alan -->
+                    <div class="doctor-card p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Alan (Dermatologist)')">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-hand-dots"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Alan</div>
+                            <div class="text-xs text-amber-400 font-medium">Dermatologist</div>
+                        </div>
+                    </div>
+
+                    <!-- Dr. Maya -->
+                    <div class="doctor-card p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Maya (Neurologist)')">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-microscope"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Maya</div>
+                            <div class="text-xs text-indigo-400 font-medium">Neurologist</div>
+                        </div>
+                    </div>
+
+                    <!-- Dr. Robert -->
+                    <div class="doctor-card p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Robert (Orthopedic)')">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-bone"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Robert</div>
+                            <div class="text-xs text-emerald-400 font-medium">Orthopedic</div>
+                        </div>
+                    </div>
+
+                    <!-- Dr. Elena -->
+                    <div class="doctor-card p-4 rounded-2xl bg-slate-900/60 cursor-pointer flex flex-col items-center text-center gap-2"
+                         onclick="selectDoctor(this, 'Dr. Elena (Pediatrician)')">
+                        <div class="w-12 h-12 rounded-2xl bg-pink-500/20 text-pink-400 border border-pink-500/30 flex items-center justify-center text-xl shadow-lg">
+                            <i class="fa-solid fa-baby"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Dr. Elena</div>
+                            <div class="text-xs text-pink-400 font-medium">Pediatrician</div>
+                        </div>
+                    </div>
+
+                </div>
+                <input type="hidden" id="doctor_name" value="Dr. Nikhil (Ophthalmologist)" required>
+            </div>
+
+            <!-- Description / Disease Explaining Input -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">
+                    <i class="fa-solid fa-notes-medical text-sky-400 mr-1.5"></i> Description / Symptoms (Explain Disease or Concerns)
+                </label>
+                <textarea id="description" rows="3" placeholder="Describe symptoms, medical history, or specific concerns for the doctor..."
+                    class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white placeholder-slate-600 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-none"></textarea>
+            </div>
+
+            <!-- Date & Time Row with Interactive Calendar Picker -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Appointment Date with Native Calendar -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">
+                        <i class="fa-solid fa-calendar-days text-sky-400 mr-1.5"></i> Appointment Date
+                    </label>
+                    <div class="relative">
+                        <input type="date" id="appointment_date" required 
+                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-sky-400 transition cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Select Time -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">
+                        <i class="fa-regular fa-clock text-sky-400 mr-1.5"></i> Select Time
+                    </label>
+                    <div class="relative">
+                        <input type="time" id="appointment_time" required 
+                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-sky-400 transition cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" 
+                class="w-full py-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2 text-base">
+                <i class="fa-solid fa-circle-check"></i> Confirm Booking
+            </button>
+        </form>
+
+        <div id="alertBox" class="hidden mt-4 p-4 rounded-xl text-center text-sm font-bold"></div>
+    </main>
+
+    <script>
+        function selectDoctor(element, doctorValue) {
+            document.querySelectorAll('.doctor-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('doctor_name').value = doctorValue;
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const alertBox = document.getElementById('alertBox');
+            
             const payload = {
-                patient_name: document.getElementById('patientName').value.trim(),
-                doctor_name: document.getElementById('doctorName').value,
-                appointment_date: document.getElementById('appDate').value,
-                appointment_time: document.getElementById('appTime').value
+                patient_name: document.getElementById('patient_name').value,
+                doctor_name: document.getElementById('doctor_name').value,
+                description: document.getElementById('description').value,
+                appointment_date: document.getElementById('appointment_date').value,
+                appointment_time: document.getElementById('appointment_time').value
             };
 
-            const res = await fetch('/api/appointments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const res = await fetch('/api/appointments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            if (res.ok) {
-                alert('Appointment Booked Successfully!');
-                // REDIRECT FEATURE: Automatically navigate to the appointments view page
-                window.location.href = '/view';
-            } else {
-                alert('Error booking appointment.');
+                const result = await res.json();
+                alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-300', 'bg-rose-500/20', 'text-rose-300');
+                
+                if (res.ok) {
+                    alertBox.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border', 'border-emerald-500/30');
+                    alertBox.innerText = '✨ ' + result.message;
+                    document.getElementById('patient_name').value = '';
+                    document.getElementById('description').value = '';
+                } else {
+                    alertBox.classList.add('bg-rose-500/20', 'text-rose-300', 'border', 'border-rose-500/30');
+                    alertBox.innerText = '⚠️ ' + (result.message || 'Error creating appointment.');
+                }
+            } catch (err) {
+                alertBox.classList.remove('hidden');
+                alertBox.classList.add('bg-rose-500/20', 'text-rose-300', 'border', 'border-rose-500/30');
+                alertBox.innerText = '⚠️ Server connection failed.';
             }
         });
     </script>
 </body>
-
 </html>

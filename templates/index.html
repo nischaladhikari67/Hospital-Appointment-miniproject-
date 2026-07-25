@@ -1,65 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>CarePoint Hospital</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTN HEALTH CARE - Modern Healthcare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f7fafc;
-            text-align: center;
-            padding-top: 5rem;
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #090d16;
         }
-
-        h1 {
-            color: #2b6cb0;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        p {
-            color: #4a5568;
-            margin-bottom: 2rem;
-        }
-
-        .nav-card {
-            display: inline-block;
-            background: white;
-            padding: 2rem;
-            margin: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 250px;
-            text-decoration: none;
-            color: #2d3748;
-            transition: transform 0.2s;
-        }
-
-        .nav-card:hover {
-            transform: translateY(-5px);
-            color: #2b6cb0;
-        }
-
-        .nav-card h2 {
-            margin-bottom: 0.5rem;
+        .dark-card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
     </style>
 </head>
+<body class="text-slate-100 min-h-screen flex flex-col font-sans">
 
-<body>
-    <h1>🏥 CarePoint Health Center</h1>
-    <p>Select an option below to proceed</p>
+    <!-- Navbar -->
+    <nav class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-sky-500/20 text-sky-400 border border-sky-500/30 rounded-xl text-xl">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <span class="text-xl font-black tracking-tight text-white">NTN <span class="text-sky-400">HEALTH CARE</span></span>
+        </div>
+        <div class="flex gap-2">
+            <a href="/" class="px-4 py-2 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/30 font-semibold text-sm transition">Dashboard</a>
+            <a href="/book" class="px-4 py-2 rounded-xl hover:bg-slate-800 text-slate-300 font-medium text-sm transition">Book Appointment</a>
+            <a href="/view" class="px-4 py-2 rounded-xl hover:bg-slate-800 text-slate-300 font-medium text-sm transition">Manage Appointments</a>
+        </div>
+    </nav>
 
-    <a href="/book" class="nav-card">
-        <h2>📝 Book Appointment</h2>
-        <p>Schedule a new visit with a specialist</p>
-    </a>
+    <!-- Main Content -->
+    <main class="flex-1 max-w-6xl mx-auto w-full p-6 space-y-8 mt-6">
+        <div class="dark-card rounded-3xl p-10 text-center relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <h1 class="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">Healthcare Reimagined</h1>
+            <p class="text-slate-400 max-w-2xl mx-auto mb-8 text-base">Manage medical schedules, book top specialists across 8 medical departments, and control appointment workflows.</p>
+            
+            <div class="flex justify-center gap-4">
+                <a href="/book" class="px-6 py-3.5 bg-sky-500 hover:bg-sky-400 text-slate-955 font-bold rounded-xl shadow-lg shadow-sky-500/20 transition flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-plus"></i> Book Now
+                </a>
+                <a href="/view" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition flex items-center gap-2 border border-slate-700">
+                    <i class="fa-solid fa-list-check"></i> View Appointments
+                </a>
+            </div>
+        </div>
 
-    <a href="/view" class="nav-card">
-        <h2>📋 Admin Dashboard</h2>
-        <p>View and manage all scheduled appointments</p>
-    </a>
+        <!-- Metric Badges -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="dark-card p-6 rounded-2xl flex items-center gap-4">
+                <div class="p-4 bg-cyan-500/10 text-cyan-400 rounded-2xl text-2xl border border-cyan-500/20"><i class="fa-solid fa-user-doctor"></i></div>
+                <div>
+                    <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Specialists Doctors</p>
+                    <h3 class="text-xl font-bold text-white">8 Departments</h3>
+                </div>
+            </div>
+            <!-- Updated Card -->
+            <div class="dark-card p-6 rounded-2xl flex items-center gap-4">
+                <div class="p-4 bg-purple-500/10 text-purple-400 rounded-2xl text-2xl border border-purple-500/20"><i class="fa-regular fa-clock"></i></div>
+                <div>
+                    <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">CUSTOM SCHEDULES</p>
+                    <h3 class="text-xl font-bold text-white">24/7 Available</h3>
+                </div>
+            </div>
+            <div class="dark-card p-6 rounded-2xl flex items-center gap-4">
+                <div class="p-4 bg-emerald-500/10 text-emerald-400 rounded-2xl text-2xl border border-emerald-500/20"><i class="fa-solid fa-shield-halved"></i></div>
+                <div>
+                    <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Security</p>
+                    <h3 class="text-xl font-bold text-white">HIPAA Compliant</h3>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
-
 </html>

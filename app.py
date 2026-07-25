@@ -1,6 +1,5 @@
-# pyrefly: ignore [missing-import]
+# app.py
 from flask import Flask, render_template, request, jsonify
-# pyrefly: ignore [missing-import]
 import mysql.connector
 
 app = Flask(__name__)
@@ -8,7 +7,7 @@ app = Flask(__name__)
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '432@Nuiwx',
+    'password': 'strongpassword@#',
     'database': 'hospital_db'
 }
 
@@ -71,7 +70,6 @@ def create_appointment():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# NEW FEATURE: Update Status (Complete / Cancel)
 @app.route('/api/appointments/<int:app_id>/status', methods=['PUT'])
 def update_status(app_id):
     try:
