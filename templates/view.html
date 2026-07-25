@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Appointments Dashboard - CarePoint</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f7fafc;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2b6cb0;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        th {
+            background: #edf2f7;
+        }
+
+        .btn-complete {
+            background: #38a169;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .badge-scheduled {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .badge-completed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .top-nav {
+            margin-bottom: 1rem;
+            max-width: 900px;
+            margin: 0 auto 1rem auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .top-nav a {
+            text-decoration: none;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-nav">
+        <a href="/">← Back to Home</a>
+        <a href="/book">+ Book New Appointment</a>
+    </div>
+
+    <div class="container">
+        <h2>Scheduled Appointments</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="appointmentTable"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadData() {
+            const res = await fetch('/api/appointments');
+            const result = await res.json();
+            const tbody = document.getElementById('appointmentTable');
+            tbody.innerHTML = '';
+
+            result.data.forEach(app => {
+                const tr = document.createElement('tr');
+                const isCompleted = app.status === 'Completed';
+                tr.innerHTML = `
+                    <td><strong>${app.patient_name}</strong></td>
+                    <td>${app.doctor_name}</td>
+                    <td>${app.appointment_date} @ ${app.appointment_time}</td>
+                    <td><span class="badge ${isCompleted ? 'badge-completed' : 'badge-scheduled'}">${app.status}</span></td>
+                    <td>
+                        ${!isCompleted ? `<button class="btn-complete" onclick="markCompleted(${app.id})">Complete</button>` : ''}
+                        <button class="btn-delete" onclick="deleteApp(${app.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function markCompleted(id) {
+            await fetch(`/api/appointments/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Completed' })
+            });
+            loadData();
+        }
+
+        async function deleteApp(id) {
+            if (confirm('Delete this record?')) {
+                await fetch(`/api/appointments/${id}`, { method: 'DELETE' });
+                loadData();
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+
+</html>

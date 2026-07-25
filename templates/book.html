@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Book Appointment - CarePoint</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f7fafc;
+            padding: 2rem;
+        }
+
+        .card {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2b6cb0;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .top-nav {
+            margin-bottom: 1rem;
+            max-width: 500px;
+            margin: 0 auto 1rem auto;
+        }
+
+        .top-nav a {
+            text-decoration: none;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-nav"><a href="/">← Back to Home</a></div>
+    <div class="card">
+        <h2>Book Appointment</h2>
+        <form id="bookForm">
+            <div class="form-group">
+                <label>Patient Full Name</label>
+                <input type="text" id="patientName" required placeholder="e.g. Jane Doe">
+            </div>
+            <div class="form-group">
+                <label>Select Specialist</label>
+                <select id="doctorName" required>
+                    <option value="">-- Select Doctor --</option>
+                    <option value="Dr. Smith (Cardiology)">Dr. Smith (Cardiology)</option>
+                    <option value="Dr. Patel (Dermatology)">Dr. Patel (Dermatology)</option>
+                    <option value="Dr. Sharma (Pediatrics)">Dr. Sharma (Pediatrics)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="appDate" required>
+            </div>
+            <div class="form-group">
+                <label>Time</label>
+                <input type="time" id="appTime" required>
+            </div>
+            <button type="submit">Submit Booking</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('appDate').min = new Date().toISOString().split('T')[0];
+
+        document.getElementById('bookForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                patient_name: document.getElementById('patientName').value.trim(),
+                doctor_name: document.getElementById('doctorName').value,
+                appointment_date: document.getElementById('appDate').value,
+                appointment_time: document.getElementById('appTime').value
+            };
+
+            const res = await fetch('/api/appointments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert('Appointment Booked Successfully!');
+                // REDIRECT FEATURE: Automatically navigate to the appointments view page
+                window.location.href = '/view';
+            } else {
+                alert('Error booking appointment.');
+            }
+        });
+    </script>
+</body>
+
+</html>
