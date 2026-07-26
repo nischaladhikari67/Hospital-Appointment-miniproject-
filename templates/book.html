@@ -26,7 +26,6 @@
             background: rgba(56, 189, 248, 0.1);
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
         }
-        /* Custom styling for dark mode date and time inputs */
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
@@ -49,9 +48,14 @@
             </div>
             <span>Back to Dashboard</span>
         </a>
-        <div class="flex items-center gap-2 text-sky-400 font-extrabold text-sm tracking-wider">
-            <i class="fa-solid fa-square-h text-xl"></i> NTN HEALTH CARE
-        </div>
+        
+        <!-- Replaced Logo with View Appointment Link -->
+        <a href="/view" class="group flex items-center gap-2 text-sm font-semibold text-sky-400 hover:text-sky-300 transition">
+            <div class="p-2 rounded-xl bg-sky-500/10 border border-sky-500/20 group-hover:bg-sky-500/20 transition">
+                <i class="fa-solid fa-list-check text-base"></i>
+            </div>
+            <span class="font-bold">View Appointments</span>
+        </a>
     </div>
 
     <!-- Main Container -->
@@ -74,7 +78,7 @@
                     class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition">
             </div>
 
-            <!-- Doctor Visual Selector Cards (8 Doctors Grid) -->
+            <!-- Doctor Visual Selector Cards -->
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">
                     <i class="fa-solid fa-user-doctor text-sky-400 mr-1.5"></i> Select Specialist
@@ -191,28 +195,22 @@
                     class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white placeholder-slate-600 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-none"></textarea>
             </div>
 
-            <!-- Date & Time Row with Interactive Calendar Picker -->
+            <!-- Date & Time Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Appointment Date with Native Calendar -->
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">
                         <i class="fa-solid fa-calendar-days text-sky-400 mr-1.5"></i> Appointment Date
                     </label>
-                    <div class="relative">
-                        <input type="date" id="appointment_date" required 
-                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-sky-400 transition cursor-pointer">
-                    </div>
+                    <input type="date" id="appointment_date" required 
+                        class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-sky-400 transition cursor-pointer">
                 </div>
 
-                <!-- Select Time -->
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">
                         <i class="fa-regular fa-clock text-sky-400 mr-1.5"></i> Select Time
                     </label>
-                    <div class="relative">
-                        <input type="time" id="appointment_time" required 
-                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-sky-400 transition cursor-pointer">
-                    </div>
+                    <input type="time" id="appointment_time" required 
+                        class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-sky-400 transition cursor-pointer">
                 </div>
             </div>
 
