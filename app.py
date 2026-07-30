@@ -39,7 +39,7 @@ def get_appointments():
             SELECT id, patient_name, doctor_name, 
                    DATE_FORMAT(appointment_date, '%Y-%m-%d') as appointment_date, 
                    TIME_FORMAT(appointment_time, '%H:%i') as appointment_time, 
-                   status 
+                   description, status 
             FROM appointments 
             ORDER BY appointment_date, appointment_time
         """
@@ -58,10 +58,16 @@ def create_appointment():
         conn = get_db_connection()
         cursor = conn.cursor()
         query = """
-            INSERT INTO appointments (patient_name, doctor_name, appointment_date, appointment_time)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO appointments (patient_name, doctor_name, appointment_date, appointment_time, description)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        values = (data['patient_name'], data['doctor_name'], data['appointment_date'], data['appointment_time'])
+        values = (
+            data['patient_name'], 
+            data['doctor_name'], 
+            data['appointment_date'], 
+            data['appointment_time'],
+            data.get('description', '')
+        )
         cursor.execute(query, values)
         conn.commit()
         cursor.close()
