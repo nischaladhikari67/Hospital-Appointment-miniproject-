@@ -1,14 +1,17 @@
-# app.py
+import os
 from flask import Flask, render_template, request, jsonify
 import mysql.connector
 
 app = Flask(__name__)
 
+# --- DATABASE CONFIGURATION ---
+# Reads from Railway Environment Variables (or defaults to your Aiven settings)
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'strongpassword@#',
-    'database': 'hospital_db'
+    'host': os.environ.get('DB_HOST', 'mysql001-nikhildhamisingh.l.aivencloud.com'),
+    'port': int(os.environ.get('DB_PORT', 12231)),
+    'user': os.environ.get('DB_USER', 'avnadmin'),
+    'password': os.environ.get('DB_PASSWORD', ''),
+    'database': os.environ.get('DB_NAME', 'defaultdb')
 }
 
 def get_db_connection():
