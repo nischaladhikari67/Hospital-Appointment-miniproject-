@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NTN HEALTH CARE - Patient Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes floatGlow {
+      0%, 100% { transform: translate(0px, 0px) scale(1); opacity: 0.35; }
+      50% { transform: translate(30px, -40px) scale(1.15); opacity: 0.55; }
+    }
+    .animate-glow-1 { animation: floatGlow 12s ease-in-out infinite; }
+    .animate-glow-2 { animation: floatGlow 16s ease-in-out infinite reverse; }
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen relative overflow-x-hidden font-sans">
+
+  <!-- Background Glows -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-glow-1"></div>
+    <div class="absolute bottom-10 right-0 w-[28rem] h-[28rem] bg-indigo-600/20 rounded-full blur-3xl animate-glow-2"></div>
+  </div>
+
+  <main class="relative z-10 max-w-5xl mx-auto px-4 py-6">
+    <!-- Navbar -->
+    <div class="flex justify-between items-center mb-8 bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">P</div>
+        <div>
+          <h2 class="font-bold text-white leading-tight">{{ user.full_name }}</h2>
+          <p class="text-xs text-cyan-400">Patient Dashboard</p>
+        </div>
+      </div>
+      <button onclick="logout()" class="px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs rounded-xl border border-rose-500/30 transition">
+        <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Booking Form -->
+      <div class="lg:col-span-1 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-calendar-plus text-cyan-400 mr-2"></i>Book Consultation</h3>
+        
+        <form id="patientBookingForm" class="space-y-4">
+          <input type="hidden" id="doctor_name">
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-2">Select Specialist</label>
+            <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+              <div onclick="selectDoc(this, 'Dr. Nikhil (Ophthalmologist)')" class="doc-item cursor-pointer p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-xs hover:border-cyan-500 transition">Dr. Nikhil (Ophthalmologist)</div>
+              <div onclick="selectDoc(this, 'Dr. Nischal (Psychologist)')" class="doc-item cursor-pointer p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-xs hover:border-cyan-500 transition">Dr. Nischal (Psychologist)</div>
+              <div onclick="selectDoc(this, 'Dr. Tarjan (Gynecologist)')" class="doc-item cursor-pointer p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-xs hover:border-cyan-500 transition">Dr. Tarjan (Gynecologist)</div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Date</label>
+            <input type="date" id="appointment_date" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Time Slot (24/7 Available)</label>
+            <input type="time" id="appointment_time" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Description / Symptoms</label>
+            <textarea id="description" rows="2" placeholder="Detail your health concerns..." class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 text-xs text-white resize-none"></textarea>
+          </div>
+
+          <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 py-2.5 rounded-xl text-xs font-semibold shadow-lg shadow-cyan-500/20 transition">
+            Confirm Booking
+          </button>
+        </form>
+      </div>
+
+      <!-- My Appointments List -->
+      <div class="lg:col-span-2 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i>My Scheduled Visits</h3>
+        <div id="patientAppList" class="space-y-3">
+          <p class="text-xs text-slate-500">Loading appointments...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function selectDoc(el, name) {
+      document.querySelectorAll('.doc-item').forEach(i => i.classList.remove('border-cyan-500', 'bg-cyan-950/40'));
+      el.classList.add('border-cyan-500', 'bg-cyan-950/40');
+      document.getElementById('doctor_name').value = name;
+    }
+
+    async function loadAppointments() {
+      const res = await fetch('/api/patient/appointments');
+      const data = await res.json();
+      const container = document.getElementById('patientAppList');
+      container.innerHTML = '';
+
+      if(!data.data || data.data.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500">No appointments scheduled yet.</p>`;
+        return;
+      }
+
+      data.data.forEach(a => {
+        let statusBadge = a.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                          a.status === 'Cancelled' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+        container.innerHTML += `
+          <div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl flex justify-between items-center text-xs">
+            <div>
+              <p class="font-bold text-white text-sm">${a.doctor_name}</p>
+              <p class="text-slate-400 mt-0.5"><i class="fa-solid fa-calendar mr-1"></i>${a.appointment_date} at ${a.appointment_time}</p>
+              <p class="text-slate-500 text-[11px] mt-1">${a.description || 'No description provided.'}</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full border text-[11px] font-semibold ${statusBadge}">${a.status}</span>
+          </div>
+        `;
+      });
+    }
+
+    document.getElementById('patientBookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const doc = document.getElementById('doctor_name').value;
+      if(!doc) return alert('Select a doctor first.');
+
+      const payload = {
+        doctor_name: doc,
+        appointment_date: document.getElementById('appointment_date').value,
+        appointment_time: document.getElementById('appointment_time').value,
+        description: document.getElementById('description').value
+      };
+
+      const res = await fetch('/api/patient/appointments', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if(res.ok) {
+        alert('Appointment Booked!');
+        loadAppointments();
+      }
+    });
+
+    async function logout() {
+      await fetch('/api/auth/logout', {method: 'POST'});
+      window.location.href = '/login';
+    }
+
+    loadAppointments();
+  </script>
+</body>
+</html>

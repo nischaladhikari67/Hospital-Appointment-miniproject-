@@ -1,18 +1,30 @@
 CREATE DATABASE IF NOT EXISTS hospital_db;
 USE hospital_db;
 
-CREATE TABLE IF NOT EXISTS appointments (
+-- Drop existing tables to refresh schema cleanly
+DROP TABLE IF EXISTS appointments;
+DROP TABLE IF EXISTS users;
+
+-- Users table for Doctors and Admins
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_name VARCHAR(100) NOT NULL,
-    doctor_name VARCHAR(100) NOT NULL,
-    appointment_date DATE NOT NULL,
-    appointment_time TIME NOT NULL,
-    status VARCHAR(20) DEFAULT 'Scheduled',
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('doctor', 'admin') NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    specialty VARCHAR(100) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sample Data
-INSERT INTO appointments (patient_name, doctor_name, appointment_date, appointment_time) 
-VALUES 
-('Sarah Jenkins', 'Dr. Smith (Cardiology)', '2026-07-28', '10:30:00'),
-('David Lee', 'Dr. Patel (Dermatology)', '2026-07-29', '14:00:00');
+-- Appointments table
+CREATE TABLE IF NOT EXISTS appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_name VARCHAR(100) NOT NULL,
+    patient_phone VARCHAR(20) DEFAULT NULL,
+    doctor_name VARCHAR(100) NOT NULL,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    description TEXT,
+    status ENUM('Scheduled', 'Completed', 'Cancelled') DEFAULT 'Scheduled',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
