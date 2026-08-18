@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NTN HEALTH CARE - Doctor Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes floatGlow {
+      0%, 100% { transform: translate(0px, 0px) scale(1); opacity: 0.35; }
+      50% { transform: translate(30px, -40px) scale(1.15); opacity: 0.55; }
+    }
+    .animate-glow-1 { animation: floatGlow 12s ease-in-out infinite; }
+    .animate-glow-2 { animation: floatGlow 16s ease-in-out infinite reverse; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen relative overflow-x-hidden font-sans">
+
+  <!-- Background Orbs -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-glow-1"></div>
+    <div class="absolute bottom-10 right-0 w-[28rem] h-[28rem] bg-cyan-600/20 rounded-full blur-3xl animate-glow-2"></div>
+  </div>
+
+  <main class="relative z-10 max-w-6xl mx-auto px-4 py-6">
+    <!-- Navbar -->
+    <div class="flex justify-between items-center mb-8 bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">Dr</div>
+        <div>
+          <h2 class="font-bold text-white leading-tight">{{ user.full_name }}</h2>
+          <p class="text-xs text-indigo-400">Specialty: {{ user.specialty }}</p>
+        </div>
+      </div>
+      <button onclick="logout()" class="px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs rounded-xl border border-rose-500/30 transition">
+        <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+      </button>
+    </div>
+
+    <!-- Doctor Appointments CRUD Panel -->
+    <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-stethoscope text-indigo-400 mr-2"></i>Assigned Patient Schedule</h3>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-950/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+              <th class="p-3">Patient</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Time</th>
+              <th class="p-3">Description</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-center">Actions (CRUD)</th>
+            </tr>
+          </thead>
+          <tbody id="doctorTable" class="divide-y divide-slate-800/60 text-xs">
+            <tr><td colspan="6" class="p-4 text-slate-500 text-center">Loading appointments...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-md space-y-4">
+      <h4 class="font-bold text-white text-base">Edit Appointment Record</h4>
+      <input type="hidden" id="edit_id">
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Date</label>
+        <input type="date" id="edit_date" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
+      </div>
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Time</label>
+        <input type="time" id="edit_time" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
+      </div>
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Status</label>
+        <select id="edit_status" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
+          <option value="Scheduled">Scheduled</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Description</label>
+        <textarea id="edit_desc" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white resize-none" rows="2"></textarea>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 text-xs text-slate-300 rounded-xl">Cancel</button>
+        <button onclick="saveEdit()" class="px-4 py-2 bg-indigo-600 text-xs text-white font-semibold rounded-xl">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let appData = [];
+
+    async function loadDoctorSchedule() {
+      const res = await fetch('/api/doctor/appointments');
+      const data = await res.json();
+      appData = data.data || [];
+      const tbody = document.getElementById('doctorTable');
+      tbody.innerHTML = '';
+
+      if(appData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-slate-500 text-center">No assigned patient appointments found.</td></tr>`;
+        return;
+      }
+
+      appData.forEach(item => {
+        let statusBadge = item.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                          item.status === 'Cancelled' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/30">
+            <td class="p-3 font-semibold text-white">${item.patient_name}</td>
+            <td class="p-3 text-slate-300">${item.appointment_date}</td>
+            <td class="p-3 text-slate-300">${item.appointment_time}</td>
+            <td class="p-3 text-slate-400 text-xs">${item.description || 'N/A'}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full border text-[11px] ${statusBadge}">${item.status}</span></td>
+            <td class="p-3 text-center space-x-1">
+              <button onclick="openEdit(${item.id})" class="p-1.5 bg-indigo-500/20 text-indigo-300 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteApp(${item.id})" class="p-1.5 bg-rose-500/20 text-rose-300 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openEdit(id) {
+      const item = appData.find(a => a.id === id);
+      if(!item) return;
+      document.getElementById('edit_id').value = item.id;
+      document.getElementById('edit_date').value = item.appointment_date;
+      document.getElementById('edit_time').value = item.appointment_time;
+      document.getElementById('edit_status').value = item.status;
+      document.getElementById('edit_desc').value = item.description || '';
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    async function saveEdit() {
+      const id = document.getElementById('edit_id').value;
+      const payload = {
+        appointment_date: document.getElementById('edit_date').value,
+        appointment_time: document.getElementById('edit_time').value,
+        status: document.getElementById('edit_status').value,
+        description: document.getElementById('edit_desc').value
+      };
+
+      await fetch(`/api/appointments/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      closeModal();
+      loadDoctorSchedule();
+    }
+
+    async function deleteApp(id) {
+      if(confirm('Cancel and delete this appointment?')) {
+        await fetch(`/api/appointments/${id}`, {method: 'DELETE'});
+        loadDoctorSchedule();
+      }
+    }
+
+    async function logout() {
+      await fetch('/api/auth/logout', {method: 'POST'});
+      window.location.href = '/login';
+    }
+
+    loadDoctorSchedule();
+  </script>
+</body>
+</html>
