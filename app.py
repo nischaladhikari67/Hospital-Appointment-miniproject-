@@ -7,7 +7,7 @@ app.secret_key = 'ntn_healthcare_super_secret_key'
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'strongpassword@#',  # Update with your MySQL password
+    'password': '432@Nuiwx',  # Update with your MySQL password
     'database': 'hospital_db'
 }
 
@@ -38,24 +38,53 @@ def admin_page():
         return redirect('/staff-portal')
     return render_template('admin_dashboard.html', user=session)
 
-# --- Patient Public Booking API ---
+# --- Public APIs ---
+
+@app.route('/api/doctors', methods=['GET'])
+def get_public_doctors():
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, full_name, specialty FROM users WHERE role = 'doctor'")
+    doctors = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify({'status': 'success', 'data': doctors})
 
 @app.route('/api/patient/book', methods=['POST'])
 def public_book_appointment():
-    data = request.json
+    data = request.json or {}
     conn = get_db()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
+    
+    # 1. Determine the doctor_id securely
+    doctor_id = data.get('doctor_id')
+    
+    # Fallback: If frontend sent 'doctor_name' instead of 'doctor_id'
+    if not doctor_id and 'doctor_name' in data:
+        cursor.execute("SELECT id FROM users WHERE full_name LIKE %s AND role = 'doctor' LIMIT 1", (f"%{data['doctor_name']}%",))
+        doc_res = cursor.fetchone()
+        if doc_res:
+            doctor_id = doc_res['id']
+
+    # Default fallback to first doctor in DB if still not found
+    if not doctor_id:
+        cursor.execute("SELECT id FROM users WHERE role = 'doctor' LIMIT 1")
+        first_doc = cursor.fetchone()
+        doctor_id = first_doc['id'] if first_doc else 2
+
+    # 2. Insert into appointments table safely
     cursor.execute("""
-        INSERT INTO appointments (patient_name, patient_phone, doctor_name, appointment_date, appointment_time, description)
+        INSERT INTO appointments (patient_name, patient_phone, doctor_id, appointment_date, appointment_time, description)
         VALUES (%s, %s, %s, %s, %s, %s)
     """, (
-        data['patient_name'],
+        data.get('patient_name', ''),
         data.get('patient_phone', ''),
-        data['doctor_name'],
-        data['appointment_date'],
-        data['appointment_time'],
+        doctor_id,
+        data.get('appointment_date', ''),
+        data.get('appointment_time', ''),
         data.get('description', '')
     ))
+    
     conn.commit()
     cursor.close()
     conn.close()
@@ -65,7 +94,7 @@ def public_book_appointment():
 
 @app.route('/api/auth/register', methods=['POST'])
 def register_staff():
-    data = request.json
+    data = request.json or {}
     conn = get_db()
     cursor = conn.cursor()
     try:
@@ -73,10 +102,10 @@ def register_staff():
             INSERT INTO users (username, password, role, full_name, specialty)
             VALUES (%s, %s, %s, %s, %s)
         """, (
-            data['username'],
-            data['password'],
-            data['role'],
-            data['full_name'],
+            data.get('username'),
+            data.get('password'),
+            data.get('role'),
+            data.get('full_name'),
             data.get('specialty', None)
         ))
         conn.commit()
@@ -89,12 +118,12 @@ def register_staff():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login_staff():
-    data = request.json
+    data = request.json or {}
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
         SELECT * FROM users WHERE username = %s AND password = %s AND role = %s
-    """, (data['username'], data['password'], data['role']))
+    """, (data.get('username'), data.get('password'), data.get('role')))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -109,10 +138,12 @@ def login_staff():
     
     return jsonify({'status': 'error', 'message': 'Invalid credentials or role selection'}), 401
 
-@app.route('/api/auth/logout', methods=['POST'])
+@app.route('/api/auth/logout', methods=['GET', 'POST'])
 def logout_staff():
     session.clear()
-    return jsonify({'status': 'success'})
+    if request.method == 'GET' or request.headers.get('Accept', '').find('text/html') != -1:
+        return redirect('/staff-portal')
+    return jsonify({'status': 'success', 'redirect': '/staff-portal'})
 
 # --- Doctor CRUD APIs ---
 
@@ -121,15 +152,17 @@ def get_doctor_appointments():
     if session.get('role') != 'doctor':
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
     
-    doc_filter = f"%{session['full_name']}%"
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT id, patient_name, patient_phone, doctor_name, 
-               DATE_FORMAT(appointment_date, '%Y-%m-%d') as appointment_date, 
-               TIME_FORMAT(appointment_time, '%H:%i') as appointment_time, description, status 
-        FROM appointments WHERE doctor_name LIKE %s ORDER BY appointment_date ASC, appointment_time ASC
-    """, (doc_filter,))
+        SELECT a.id, a.patient_name, a.patient_phone, u.full_name as doctor_name, 
+               DATE_FORMAT(a.appointment_date, '%Y-%m-%d') as appointment_date, 
+               TIME_FORMAT(a.appointment_time, '%H:%i') as appointment_time, a.description, a.status 
+        FROM appointments a
+        JOIN users u ON a.doctor_id = u.id
+        WHERE a.doctor_id = %s 
+        ORDER BY a.appointment_date ASC, a.appointment_time ASC
+    """, (session['user_id'],))
     data = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -140,14 +173,14 @@ def update_appointment(app_id):
     if session.get('role') not in ['doctor', 'admin']:
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
     
-    data = request.json
+    data = request.json or {}
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("""
         UPDATE appointments 
         SET appointment_date = %s, appointment_time = %s, status = %s, description = %s
         WHERE id = %s
-    """, (data['appointment_date'], data['appointment_time'], data['status'], data['description'], app_id))
+    """, (data.get('appointment_date'), data.get('appointment_time'), data.get('status'), data.get('description'), app_id))
     conn.commit()
     cursor.close()
     conn.close()
@@ -185,14 +218,22 @@ def get_admin_metrics():
     cursor.execute("SELECT status, COUNT(*) as count FROM appointments GROUP BY status")
     status_counts = cursor.fetchall()
     
-    cursor.execute("SELECT doctor_name, COUNT(*) as count FROM appointments GROUP BY doctor_name")
+    cursor.execute("""
+        SELECT u.full_name as doctor_name, COUNT(a.id) as count 
+        FROM users u 
+        LEFT JOIN appointments a ON u.id = a.doctor_id 
+        WHERE u.role = 'doctor' 
+        GROUP BY u.id, u.full_name
+    """)
     doctor_counts = cursor.fetchall()
 
     cursor.execute("""
-        SELECT id, patient_name, patient_phone, doctor_name, 
-               DATE_FORMAT(appointment_date, '%Y-%m-%d') as appointment_date, 
-               TIME_FORMAT(appointment_time, '%H:%i') as appointment_time, status, description
-        FROM appointments ORDER BY id DESC
+        SELECT a.id, a.patient_name, a.patient_phone, u.full_name as doctor_name, 
+               DATE_FORMAT(a.appointment_date, '%Y-%m-%d') as appointment_date, 
+               TIME_FORMAT(a.appointment_time, '%H:%i') as appointment_time, a.status, a.description
+        FROM appointments a
+        JOIN users u ON a.doctor_id = u.id
+        ORDER BY a.id DESC
     """)
     all_appointments = cursor.fetchall()
 
