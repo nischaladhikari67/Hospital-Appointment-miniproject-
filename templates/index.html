@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,42 +9,70 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @keyframes floatGlow {
-      0%, 100% { transform: translate(0px, 0px) scale(1); opacity: 0.35; }
-      50% { transform: translate(30px, -40px) scale(1.15); opacity: 0.55; }
+
+      0%,
+      100% {
+        transform: translate(0px, 0px) scale(1);
+        opacity: 0.35;
+      }
+
+      50% {
+        transform: translate(30px, -40px) scale(1.15);
+        opacity: 0.55;
+      }
     }
-    .animate-glow-1 { animation: floatGlow 12s ease-in-out infinite; }
-    .animate-glow-2 { animation: floatGlow 16s ease-in-out infinite reverse; }
+
+    .animate-glow-1 {
+      animation: floatGlow 12s ease-in-out infinite;
+    }
+
+    .animate-glow-2 {
+      animation: floatGlow 16s ease-in-out infinite reverse;
+    }
+
     input[type="date"]::-webkit-calendar-picker-indicator,
-    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen relative overflow-x-hidden font-sans selection:bg-cyan-500 selection:text-slate-950">
+
+<body
+  class="bg-slate-950 text-slate-100 min-h-screen relative overflow-x-hidden font-sans selection:bg-cyan-500 selection:text-slate-950">
 
   <!-- Background Orbs -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
     <div class="absolute -top-20 -left-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-glow-1"></div>
-    <div class="absolute bottom-10 right-0 w-[28rem] h-[28rem] bg-indigo-600/20 rounded-full blur-3xl animate-glow-2"></div>
+    <div class="absolute bottom-10 right-0 w-[28rem] h-[28rem] bg-indigo-600/20 rounded-full blur-3xl animate-glow-2">
+    </div>
   </div>
 
   <main class="relative z-10 max-w-4xl mx-auto px-4 py-8">
     <!-- Navbar -->
-    <div class="flex justify-between items-center mb-8 bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-xl shadow-lg">
+    <div
+      class="flex justify-between items-center mb-8 bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-xl shadow-lg">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xl shadow-inner shadow-cyan-500/30">
+        <div
+          class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xl shadow-inner shadow-cyan-500/30">
           <i class="fa-solid fa-hospital-user"></i>
         </div>
         <div>
-          <h1 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-rose-400 text-lg">NTN HEALTH CARE</h1>
+          <h1
+            class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-rose-400 text-lg">
+            NTN HEALTH CARE</h1>
           <p class="text-xs text-slate-400">Public Patient Booking System</p>
         </div>
       </div>
-      <a href="/staff-portal" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2 shadow-md hover:border-slate-500">
+      <a href="/staff-portal"
+        class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2 shadow-md hover:border-slate-500">
         <i class="fa-solid fa-user-shield text-indigo-400"></i> Doctor / Admin Login
       </a>
     </div>
 
     <!-- Booking Form Card -->
-    <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-cyan-950/20">
+    <div
+      class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-cyan-950/20">
       <div class="mb-6">
         <h2 class="text-xl font-bold text-white flex items-center gap-2">
           <i class="fa-solid fa-calendar-check text-cyan-400"></i> Book Your Medical Appointment
@@ -52,63 +81,51 @@
       </div>
 
       <form id="publicBookingForm" class="space-y-5">
-        <input type="hidden" id="doctor_name">
+        <input type="hidden" id="doctor_id" name="doctor_id">
+        <input type="hidden" id="doctor_name" name="doctor_name">
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Your Full Name</label>
-            <input type="text" id="patient_name" required placeholder="e.g. John Doe" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
+            <input type="text" id="patient_name" required placeholder="e.g. John Doe"
+              class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
-            <input type="tel" id="patient_phone" required placeholder="e.g. +1 234 567 890" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
+            <input type="tel" id="patient_phone" required placeholder="e.g. +1 234 567 890"
+              class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-2">Select Doctor Specialist</label>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div onclick="selectDoc(this, 'Dr. Nikhil (Ophthalmologist)')" class="doc-item cursor-pointer p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-cyan-500 transition flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-eye"></i></div>
-              <div>
-                <p class="font-bold text-xs text-white">Dr. Nikhil</p>
-                <p class="text-[11px] text-cyan-400">Ophthalmologist</p>
-              </div>
-            </div>
-            <div onclick="selectDoc(this, 'Dr. Nischal (Psychologist)')" class="doc-item cursor-pointer p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-cyan-500 transition flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-brain"></i></div>
-              <div>
-                <p class="font-bold text-xs text-white">Dr. Nischal</p>
-                <p class="text-[11px] text-indigo-400">Psychologist</p>
-              </div>
-            </div>
-            <div onclick="selectDoc(this, 'Dr. Tarjan (Gynecologist)')" class="doc-item cursor-pointer p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-cyan-500 transition flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-user-nurse"></i></div>
-              <div>
-                <p class="font-bold text-xs text-white">Dr. Tarjan</p>
-                <p class="text-[11px] text-rose-400">Gynecologist</p>
-              </div>
-            </div>
+          <!-- Dynamic Doctors Grid Container -->
+          <div id="doctorListContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <p class="text-xs text-slate-500 col-span-3">Loading available doctors...</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Appointment Date</label>
-            <input type="date" id="appointment_date" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
+            <input type="date" id="appointment_date" required
+              class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Appointment Time (24/7 Available)</label>
-            <input type="time" id="appointment_time" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
+            <input type="time" id="appointment_time" required
+              class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 transition">
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Description / Symptoms</label>
-          <textarea id="description" rows="3" placeholder="Briefly describe your medical concerns or symptoms..." class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white resize-none focus:outline-none focus:border-cyan-500 transition"></textarea>
+          <textarea id="description" rows="3" placeholder="Briefly describe your medical concerns or symptoms..."
+            class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white resize-none focus:outline-none focus:border-cyan-500 transition"></textarea>
         </div>
 
-        <button type="submit" id="submitBookingBtn" class="w-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-rose-500 hover:opacity-90 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl text-sm shadow-xl shadow-cyan-500/20 transition cursor-pointer">
+        <button type="submit" id="submitBookingBtn"
+          class="w-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-rose-500 hover:opacity-90 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl text-sm shadow-xl shadow-cyan-500/20 transition cursor-pointer">
           Confirm Appointment
         </button>
       </form>
@@ -116,16 +133,56 @@
   </main>
 
   <script>
-    function selectDoc(el, name) {
+    // Fetch and dynamically list all registered doctors
+    async function loadPublicDoctors() {
+      const container = document.getElementById('doctorListContainer');
+      try {
+        const res = await fetch('/api/doctors');
+        const data = await res.json();
+
+        const doctors = data.data || [];
+        container.innerHTML = '';
+
+        if (doctors.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-500 col-span-3">No doctors currently registered.</p>`;
+          return;
+        }
+
+        doctors.forEach(doc => {
+          const formattedName = doc.full_name.toLowerCase().startsWith('dr.') ? doc.full_name : `Dr. ${doc.full_name}`;
+          const docCard = document.createElement('div');
+
+          docCard.className = 'doc-item cursor-pointer p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-cyan-500 transition flex items-center gap-3';
+          docCard.onclick = () => selectDoc(docCard, doc.id, formattedName);
+
+          docCard.innerHTML = `
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+              <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <div>
+              <p class="font-bold text-xs text-white">${formattedName}</p>
+              <p class="text-[11px] text-cyan-400">${doc.specialty || 'General Specialist'}</p>
+            </div>
+          `;
+
+          container.appendChild(docCard);
+        });
+      } catch (err) {
+        container.innerHTML = `<p class="text-xs text-rose-400 col-span-3">Failed to load doctor list.</p>`;
+      }
+    }
+
+    function selectDoc(el, id, name) {
       document.querySelectorAll('.doc-item').forEach(i => i.classList.remove('border-cyan-500', 'bg-cyan-950/40'));
       el.classList.add('border-cyan-500', 'bg-cyan-950/40');
+      document.getElementById('doctor_id').value = id;
       document.getElementById('doctor_name').value = name;
     }
 
     document.getElementById('publicBookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const doc = document.getElementById('doctor_name').value;
-      if (!doc) return alert('Please select a doctor specialist from the cards.');
+      const docId = document.getElementById('doctor_id').value;
+      if (!docId) return alert('Please select a doctor specialist from the cards.');
 
       const submitBtn = document.getElementById('submitBookingBtn');
       submitBtn.disabled = true;
@@ -135,7 +192,8 @@
         const payload = {
           patient_name: document.getElementById('patient_name').value,
           patient_phone: document.getElementById('patient_phone').value,
-          doctor_name: doc,
+          doctor_id: docId,
+          doctor_name: document.getElementById('doctor_name').value,
           appointment_date: document.getElementById('appointment_date').value,
           appointment_time: document.getElementById('appointment_time').value,
           description: document.getElementById('description').value
@@ -143,7 +201,7 @@
 
         const res = await fetch('/api/patient/book', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
@@ -152,6 +210,8 @@
         if (res.ok) {
           alert('Appointment booked successfully!');
           document.getElementById('publicBookingForm').reset();
+          document.getElementById('doctor_id').value = '';
+          document.getElementById('doctor_name').value = '';
           document.querySelectorAll('.doc-item').forEach(i => i.classList.remove('border-cyan-500', 'bg-cyan-950/40'));
         } else {
           alert(data.message || 'Booking failed. Please try again.');
@@ -163,6 +223,10 @@
         submitBtn.innerText = 'Confirm Appointment';
       }
     });
+
+    // Load doctors on init
+    loadPublicDoctors();
   </script>
 </body>
+
 </html>

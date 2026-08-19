@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>NTN HEALTH CARE - System Monitoring</title>
@@ -8,32 +9,52 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @keyframes floatGlow {
-      0%, 100% { transform: translate(0px, 0px) scale(1); opacity: 0.35; }
-      50% { transform: translate(30px, -40px) scale(1.15); opacity: 0.55; }
+
+      0%,
+      100% {
+        transform: translate(0px, 0px) scale(1);
+        opacity: 0.35;
+      }
+
+      50% {
+        transform: translate(30px, -40px) scale(1.15);
+        opacity: 0.55;
+      }
     }
-    .animate-glow-1 { animation: floatGlow 12s ease-in-out infinite; }
-    .animate-glow-2 { animation: floatGlow 16s ease-in-out infinite reverse; }
+
+    .animate-glow-1 {
+      animation: floatGlow 12s ease-in-out infinite;
+    }
+
+    .animate-glow-2 {
+      animation: floatGlow 16s ease-in-out infinite reverse;
+    }
   </style>
 </head>
+
 <body class="bg-slate-950 text-slate-100 min-h-screen relative overflow-x-hidden font-sans">
 
   <!-- Background Orbs -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
     <div class="absolute -top-20 -left-20 w-96 h-96 bg-rose-500/20 rounded-full blur-3xl animate-glow-1"></div>
-    <div class="absolute bottom-10 right-0 w-[28rem] h-[28rem] bg-cyan-600/20 rounded-full blur-3xl animate-glow-2"></div>
+    <div class="absolute bottom-10 right-0 w-[28rem] h-[28rem] bg-cyan-600/20 rounded-full blur-3xl animate-glow-2">
+    </div>
   </div>
 
   <main class="relative z-10 max-w-7xl mx-auto px-4 py-6">
     <!-- Navbar -->
-    <div class="flex justify-between items-center mb-8 bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-xl">
+    <div
+      class="flex justify-between items-center mb-8 bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-xl">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">A</div>
+        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">A
+        </div>
         <div>
           <h2 class="font-bold text-white leading-tight">Admin Oversight Console</h2>
           <p class="text-xs text-rose-400">System Analytics & Control</p>
         </div>
       </div>
-      <button onclick="logout()" class="px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs rounded-xl border border-rose-500/30 transition">
+      <button onclick="logout()"
+        class="px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs rounded-xl border border-rose-500/30 transition">
         <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
       </button>
     </div>
@@ -68,7 +89,8 @@
 
     <!-- Global Appointments Monitoring Table -->
     <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-2xl">
-      <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-chart-line text-rose-400 mr-2"></i>Global Appointment Audit Stream</h3>
+      <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-chart-line text-rose-400 mr-2"></i>Global
+        Appointment Audit Stream</h3>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -82,7 +104,9 @@
             </tr>
           </thead>
           <tbody id="adminTable" class="divide-y divide-slate-800/60 text-xs">
-            <tr><td colspan="6" class="p-4 text-slate-500 text-center">Loading audit records...</td></tr>
+            <tr>
+              <td colspan="6" class="p-4 text-slate-500 text-center">Loading audit records...</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -95,7 +119,7 @@
     async function loadAdminMetrics() {
       const res = await fetch('/api/admin/metrics');
       const data = await res.json();
-      
+
       document.getElementById('metricApps').innerText = data.metrics.total_appointments;
       document.getElementById('metricPatients').innerText = data.metrics.total_patients;
       document.getElementById('metricDoctors').innerText = data.metrics.total_doctors;
@@ -125,7 +149,7 @@
 
     function renderStatusChart(statusCounts) {
       const ctx = document.getElementById('statusChart').getContext('2d');
-      if(statusChartInst) statusChartInst.destroy();
+      if (statusChartInst) statusChartInst.destroy();
       statusChartInst = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -141,7 +165,7 @@
 
     function renderDoctorChart(doctorCounts) {
       const ctx = document.getElementById('doctorChart').getContext('2d');
-      if(doctorChartInst) doctorChartInst.destroy();
+      if (doctorChartInst) doctorChartInst.destroy();
       doctorChartInst = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -157,18 +181,19 @@
     }
 
     async function adminDelete(id) {
-      if(confirm('Admin Delete: Permanently wipe this record?')) {
-        await fetch(`/api/appointments/${id}`, {method: 'DELETE'});
+      if (confirm('Admin Delete: Permanently wipe this record?')) {
+        await fetch(`/api/appointments/${id}`, { method: 'DELETE' });
         loadAdminMetrics();
       }
     }
 
     async function logout() {
-      await fetch('/api/auth/logout', {method: 'POST'});
-      window.location.href = '/login';
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/staff-portal';
     }
 
     loadAdminMetrics();
   </script>
 </body>
+
 </html>
