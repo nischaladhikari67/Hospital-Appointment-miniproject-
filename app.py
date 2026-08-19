@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+import os
 import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = 'ntn_healthcare_super_secret_key'
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '432@Nuiwx',  # Update with your MySQL password
-    'database': 'hospital_db'
+    'host': os.getenv('MYSQLHOST', 'mysql.railway.internal'),
+    'user': os.getenv('MYSQLUSER', 'root'),
+    'password': os.getenv('MYSQLPASSWORD', 'wbUgtxPCaUHldIJIpLUCIzRJtdQiEAwt'),
+    'database': os.getenv('MYSQLDATABASE', 'hospital_db'),
+    'port': int(os.getenv('MYSQLPORT', 3306))
 }
 
 def get_db():
